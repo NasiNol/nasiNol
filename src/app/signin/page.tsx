@@ -3,18 +3,18 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
-export default function SignupPage() {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleSignup = async (e: React.FormEvent) => {
+  // LOGIN EMAIL-PASSWORD
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await authClient.signUp.email({
-      name: email.split("@")[0],
+    const { error } = await authClient.signIn.email({
       email,
       password,
       callbackURL: "http://localhost:3000/dashboard",
@@ -22,20 +22,34 @@ export default function SignupPage() {
 
     setLoading(false);
     if (error) {
-      alert(error.message || "Signup failed");
+      console.error("Login failed:", error);
+      alert("Login gagal, coba cek email/password!");
     } else {
       router.push("/dashboard");
+    }
+  };
+
+  // LOGIN DENGAN GOOGLE
+  const handleGoogleLogin = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "http://localhost:3000/dashboard",
+      });
+    } catch (err) {
+      console.error("Google login failed:", err);
+      alert("Google login gagal!");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form
-        onSubmit={handleSignup}
+        onSubmit={handleLogin}
         className="bg-white p-6 rounded-xl shadow-md w-80 space-y-4"
       >
         {/* JUDUL */}
-        <h2 className="text-2xl font-bold text-center text-black">Sign Up</h2>
+        <h2 className="text-2xl font-bold text-center text-black">Sign In</h2>
 
         {/* INPUT EMAIL */}
         <input
@@ -57,20 +71,41 @@ export default function SignupPage() {
           required
         />
 
-        {/* TOMBOL SIGNUP */}
+        {/* TOMBOL LOGIN */}
         <button
           type="submit"
           disabled={loading}
           className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition"
         >
-          {loading ? "Signing up..." : "Sign Up"}
+          {loading ? "Signing in..." : "Sign In"}
         </button>
 
-        {/* LINK LOGIN */}
+        {/* PEMBATAS */}
+        <div className="flex items-center justify-center">
+          <hr className="w-1/3 border-gray-300" />
+          <span className="mx-2 text-gray-800 text-sm font-medium">or</span>
+          <hr className="w-1/3 border-gray-300" />
+        </div>
+
+        {/* LOGIN GOOGLE */}
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full bg-red-500 text-white p-2 rounded-md hover:bg-red-600 flex items-center justify-center"
+        >
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt="Google"
+            className="w-5 h-5 mr-2"
+          />
+          Sign in with Google
+        </button>
+
+        {/* LINK DAFTAR */}
         <p className="text-sm text-center text-black">
-          Already have an account?{" "}
-          <a href="/signin" className="text-blue-600 hover:underline">
-            Sign in
+          Belum punya akun?{" "}
+          <a href="/signup" className="text-blue-600 hover:underline">
+            Daftar
           </a>
         </p>
       </form>
