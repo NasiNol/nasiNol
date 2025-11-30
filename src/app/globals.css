@@ -120,3 +120,59 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom Scrollbar for Notification */
+.notification-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E0 #F7FAFC;
+}
+
+.notification-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notification-scroll::-webkit-scrollbar-track {
+  background: #F7FAFC;
+  border-radius: 3px;
+}
+
+.notification-scroll::-webkit-scrollbar-thumb {
+  background: #CBD5E0;
+  border-radius: 3px;
+}
+
+.notification-scroll::-webkit-scrollbar-thumb:hover {
+  background: #A0AEC0;
+}
+
+/* FORCE Z-INDEX NOTIFICATIONS TO BE ON TOP */
+.notification-container {
+  z-index: 999999 !important;
+  position: relative !important;
+}
+
+.notification-dropdown {
+  z-index: 999998 !important;
+  position: absolute !important;
+}
+
+.notification-bell {
+  z-index: 999999 !important;
+  position: relative !important;
+}
+
+/* Overlay untuk memastikan notification di depan */
+.notification-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999997 !important;
+  pointer-events: none !important;
+}
+
+.notification-dropdown-content {
+  pointer-events: auto !important;
+  z-index: 999999 !important;
+}
