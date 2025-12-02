@@ -200,3 +200,11 @@ export const drinkFoods: FoodItem[] = [
     rating: '4.5'
   }
 ]
+
+// Gabungan semua produk untuk pencarian berdasarkan ID
+export const allFoods = [...recommendedFoods, ...dessertFoods, ...drinkFoods]
+
+// Fungsi helper untuk mencari produk berdasarkan ID
+export const getFoodById = (id: number): FoodItem | undefined => {
+  return allFoods.find(food => food.id === id)
+}

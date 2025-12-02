@@ -2,6 +2,7 @@
 "use client"
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { inter } from '@/lib/fonts'
 import { recommendedFoods } from '@/data/mockFood'
 
@@ -35,8 +36,9 @@ export default function RecommendedFoodsSection() {
         {/* Food Grid - 2 rows x 5 columns */}
         <div className="grid grid-cols-5 gap-x-[57px] gap-y-[25px] max-w-[1424px] mx-auto">
           {recommendedFoods.map((food) => (
-            <div 
+            <Link 
               key={food.id}
+              href={`/details?id=${food.id}`}
               className="relative group cursor-pointer"
               style={{ width: '220px', height: '213px' }}
             >
@@ -146,7 +148,7 @@ export default function RecommendedFoodsSection() {
                 </div>
 
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 

@@ -1,6 +1,7 @@
 // src/app/details/page.tsx
 "use client"
 
+import { useSearchParams } from 'next/navigation'
 import Header from '@/components/Layout/Header'
 import Footer from '@/components/Layout/Footer'
 import DetailsOrnaments from '@/components/details/DetailsOrnaments'
@@ -13,6 +14,9 @@ import ReviewsCarousel from '@/components/details/ReviewsCarousel'
 import { useProductDetails } from '@/hooks/useProductDetails'
 
 export default function DetailsPage() {
+  const searchParams = useSearchParams()
+  const productId = searchParams.get('id') ? parseInt(searchParams.get('id')!) : undefined
+
   const {
     quantity,
     setQuantity,
@@ -20,7 +24,7 @@ export default function DetailsPage() {
     restaurant,
     reviews,
     rating
-  } = useProductDetails()
+  } = useProductDetails(productId)
 
   return (
     <div className="min-h-screen bg-gray-50 relative overflow-x-hidden">
@@ -55,6 +59,10 @@ export default function DetailsPage() {
               <ProductActions 
                 quantity={quantity}
                 setQuantity={setQuantity}
+                productId={product.id}
+                productName={product.name}
+                productImage={product.image}
+                productPrice={product.price}
               />
             </div>
           </div>

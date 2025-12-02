@@ -20,6 +20,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if (typeof window !== 'undefined') {
+              window.alert = function() { return true; };
+            }
+          `
+        }} />
+      </head>
       <body className={inter.className}>
         <NotificationProvider>
           <CartProvider>
