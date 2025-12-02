@@ -1,4 +1,10 @@
-import { auth } from "@/lib/auth"; // path to your auth file
-import { toNextJsHandler } from "better-auth/next-js";
+// src/app/api/auth/[...all]/route.ts - WORKING VERSION
+import { auth } from "@/lib/auth"
+import type { NextRequest } from "next/server"
 
-export const { POST, GET } = toNextJsHandler(auth);
+// Better Auth handler untuk Next.js App Router
+async function handler(req: NextRequest) {
+  return auth.handler(req)
+}
+
+export { handler as GET, handler as POST }

@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { Food } from '@/types/food'
 
 interface CartItem extends Food {
@@ -15,30 +15,89 @@ interface CartContextType {
   clearCart: () => void
   totalItems: number
   totalPrice: number
+  isInCart: (id: string) => boolean
+  getItemQuantity: (id: string) => number
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
+const STORAGE_KEY = 'nasiNol_cart'
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  // Load cart dari localStorage saat mount
+  useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem(STORAGE_KEY)
+      if (savedCart) {
+        setItems(JSON.parse(savedCart))
+      }
+    } catch (error) {
+      console.error('Failed to load cart:', error)
+    } finally {
+      setIsLoaded(true)
+    }
+  }, [])
+
+  // Save cart ke localStorage setiap kali berubah
+  useEffect(() => {
+    if (isLoaded) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+      } catch (error) {
+        console.error('Failed to save cart:', error)
+      }
+    }
+  }, [items, isLoaded])
 
   const addToCart = (food: Food, quantity = 1) => {
-    // TODO: Implement add to cart logic
-    console.log('Add to cart:', food.name, quantity)
+    setItems((prevItems) => {
+      const existingItem = prevItems.find(item => item.id === food.id)
+      
+      if (existingItem) {
+        // Update quantity jika item sudah ada
+        return prevItems.map(item =>
+          item.id === food.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        )
+      } else {
+        // Tambah item baru
+        return [...prevItems, { ...food, quantity }]
+      }
+    })
   }
 
   const removeFromCart = (id: string) => {
-    // TODO: Implement remove from cart logic
-    console.log('Remove from cart:', id)
+    setItems((prevItems) => prevItems.filter(item => item.id !== id))
   }
 
   const updateQuantity = (id: string, quantity: number) => {
-    // TODO: Implement update quantity logic
-    console.log('Update quantity:', id, quantity)
+    if (quantity <= 0) {
+      removeFromCart(id)
+      return
+    }
+
+    setItems((prevItems) =>
+      prevItems.map(item =>
+        item.id === id ? { ...item, quantity } : item
+      )
+    )
   }
 
   const clearCart = () => {
     setItems([])
+  }
+
+  const isInCart = (id: string): boolean => {
+    return items.some(item => item.id === id)
+  }
+
+  const getItemQuantity = (id: string): number => {
+    const item = items.find(item => item.id === id)
+    return item ? item.quantity : 0
   }
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
@@ -52,7 +111,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       updateQuantity,
       clearCart,
       totalItems,
-      totalPrice
+      totalPrice,
+      isInCart,
+      getItemQuantity
     }}>
       {children}
     </CartContext.Provider>

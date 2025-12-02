@@ -33,14 +33,14 @@ export default function SignupPage() {
       name,
       email,
       password,
-      callbackURL: "http://localhost:3000/dashboard",
+      callbackURL: "http://localhost:3000/homepage",
     })
 
     setLoading(false)
     if (error) {
       alert(error.message || "Signup failed")
     } else {
-      router.push("/dashboard")
+      router.push("/homepage")
     }
   }
 
@@ -48,7 +48,7 @@ export default function SignupPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "http://localhost:3000/dashboard",
+        callbackURL: "http://localhost:3000/homepage",
       })
     } catch (err) {
       console.error("Google signup failed:", err)

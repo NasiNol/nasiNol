@@ -7,7 +7,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
 import { Eye, EyeOff } from "lucide-react"
 
 export default function LoginPage() {
@@ -15,24 +14,41 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError("")
 
-    const { error } = await authClient.signIn.email({
-      email,
-      password,
-      callbackURL: "http://localhost:3000/dashboard",
-    })
+    console.log("🔐 Attempting login with:", { email })
 
-    setLoading(false)
-    if (error) {
-      console.error("Login failed:", error)
-      alert("Login gagal, coba cek email/password!")
-    } else {
-      router.push("/dashboard")
+    try {
+      const result = await authClient.signIn.email({
+        email,
+        password,
+      })
+
+      console.log("📦 Login result:", result)
+
+      if (result.error) {
+        console.error("❌ Login error:", result.error)
+        setError(result.error.message || "Login gagal")
+        setLoading(false)
+        return
+      }
+
+      // Success!
+      console.log("✅ Login successful!")
+      console.log("🍪 Cookies:", document.cookie)
+      
+      // Redirect
+      router.push("/homepage")
+    } catch (err) {
+      console.error("💥 Exception during login:", err)
+      setError("Terjadi kesalahan saat login")
+      setLoading(false)
     }
   }
 
@@ -40,11 +56,11 @@ export default function LoginPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "http://localhost:3000/dashboard",
+        callbackURL: "/homepage",
       })
     } catch (err) {
       console.error("Google login failed:", err)
-      alert("Google login gagal!")
+      setError("Google login gagal!")
     }
   }
 
@@ -72,16 +88,24 @@ export default function LoginPage() {
             Masukkan username dan password akun
           </p>
 
+          {/* Error Alert */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-4">
             {/* Email Input */}
             <div>
               <Input
                 type="email"
-                placeholder="Nama"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full h-12 px-4 rounded-lg border border-gray-300 placeholder:text-gray-400"
                 required
+                autoComplete="email"
               />
             </div>
 
@@ -94,6 +118,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full h-12 px-4 pr-12 rounded-lg border border-gray-300 placeholder:text-gray-400"
                 required
+                autoComplete="current-password"
               />
               <button
                 type="button"
@@ -118,7 +143,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-[#60A9E4] hover:bg-[#4A90D9] text-white rounded-lg font-medium text-base"
+              className="w-full h-12 bg-[#60A9E4] hover:bg-[#4A90D9] text-white rounded-lg font-medium text-base disabled:opacity-50"
             >
               {loading ? "Loading..." : "Masuk"}
             </Button>
@@ -157,9 +182,8 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Section - Tanpa background khusus */}
+      {/* Right Section - Illustration */}
       <div className="hidden lg:block flex-1 relative">
-        {/* Ornament - elemen dekoratif kecil di belakang */}
         <Image
           src="/ornament-login.png"
           alt="Ornament"
@@ -173,7 +197,6 @@ export default function LoginPage() {
           }}
         />
         
-        {/* Main Illustration */}
         <Image
           src="/login-illustration.png"
           alt="Login Illustration"
